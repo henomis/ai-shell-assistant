@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ErrorShellAI = fmt.Errorf("🚨 OOPS")
+	ErrorShellAI = fmt.Errorf("🚨 OOPS!")
 )
 
 func main() {
