@@ -82,8 +82,10 @@ func (s *Shell) handleSuggestion(prompt string) (*ShellResponse, error) {
 
 	suggestSpinner := spinner.New(spinner.CharSets[39], 100*time.Millisecond)
 	suggestSpinner.Start()
+
 	response, err := s.completion.Suggest(prompt)
 	if err != nil {
+		suggestSpinner.Stop()
 		return nil, fmt.Errorf("completion: %w", err)
 	}
 	suggestSpinner.Stop()
