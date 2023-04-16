@@ -3,24 +3,33 @@ package completion
 import (
 	"bytes"
 	"context"
-	"encoding/json"
 	"fmt"
 	"html/template"
+	"regexp"
 	"strings"
 
 	"github.com/sashabaranov/go-openai"
 )
 
 const (
-	systemPromptTemplate = `You are a professional script developer.
-	I will ask you to create a {{ .shell }} script for the operating system {{ .os }} that can be execute in a terminal.
-	You must reply using the following JSON object:
-	{
-		"command": "the {{ .shell }} script as JSON escaped string.",
-		"executables": ["list of executables that are used in the script as JSON array of strings"],
-		"explain": "description of the {{ .shell }} script as JSON escaped string. You must describe succintly, use as few words as possible, do not be verbose. If there are multiple steps, please display them as bullet points."
-	}`
+	systemPromptTemplate = `You are a professional {{ .shell }} shell script developer.
+	I will ask you to create a {{ .shell }} script for the operating system {{ .os }} that can be execute in a terminal. 
+	You must reply using the following data format:
+
+	--script--
+	Place here the {{ .shell }} script, you must use the correct syntax for the {{ .shell }} shell, avoiding installing additional software.
+	--end-script--
+	--explain--
+	Place here the description of the script, You must describe succintly, use as few words as possible, do not be verbose and use plain text. If there are multiple steps, please display them as bullet points
+	--end-explain--
+	--commands-list--
+	Place here a list comma separated, single line of commands that are used in the script
+	--end-commands-list--
+
+	That is the data format. Do not add any additional text to your response than the required data.`
 )
+
+var outputParserRegex = regexp.MustCompile(`(?s)--script--(.*?)--end-script--.*--explain--(.*?)--end-explain--.*--commands-list--(.*?)--end-commands-list--`)
 
 type Completion struct {
 	openAIClient    *openai.Client
@@ -29,7 +38,7 @@ type Completion struct {
 }
 
 type CompletionResponse struct {
-	Command     string
+	Script      string
 	Explain     string
 	Executables []string
 }
@@ -74,12 +83,25 @@ func (c *Completion) Suggest(prompt string) (*CompletionResponse, error) {
 
 	content := response.Choices[0].Message.Content
 
+	matches := outputParserRegex.FindAllStringSubmatch(content, -1)
+	if len(matches) == 0 {
+		return nil, fmt.Errorf("no matches found: %s", content)
+	}
+
+	if len(matches[0]) != 4 {
+		return nil, fmt.Errorf("invalid number of matches")
+	}
+
 	var completionResponse CompletionResponse
 
-	err = json.Unmarshal([]byte(content), &completionResponse)
-	if err != nil {
-		return nil, fmt.Errorf("json: %w\n %s", err, content)
+	var executables []string
+	for _, executable := range strings.Split(strings.TrimSpace(matches[0][3]), ",") {
+		executables = append(executables, strings.TrimSpace(executable))
 	}
+
+	completionResponse.Script = strings.TrimSpace(matches[0][1])
+	completionResponse.Explain = strings.TrimSpace(matches[0][2])
+	completionResponse.Executables = executables
 
 	return &completionResponse, nil
 

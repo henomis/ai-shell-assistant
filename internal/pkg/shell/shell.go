@@ -105,7 +105,7 @@ func (s *Shell) handleSuggestion(prompt string) (*ShellResponse, error) {
 	}
 
 	return &ShellResponse{
-		Command:       response.Command,
+		Command:       response.Script,
 		CommandAction: newCommandActionFromUserAction(userAction),
 	}, nil
 
@@ -119,7 +119,7 @@ func printCommandLineSuggestionFromResponse(response *completion.CompletionRespo
 
 	color.NoColor = false
 	color.New(color.FgWhite, color.Bold).Printf("\n🤖 Here is your script:\n\n")
-	color.New(color.FgGreen).Printf("%s\n", response.Command)
+	color.New(color.FgGreen).Printf("%s\n", response.Script)
 	color.New(color.FgWhite).Printf("--\n")
 	color.New(color.FgYellow).Printf("Required commands: %s\n", strings.Join(response.Executables, ", "))
 	color.New(color.FgWhite, color.Italic).Printf("%s\n\n", response.Explain)
@@ -135,7 +135,7 @@ func getUserPromptFromStdin() string {
 	reader := bufio.NewReader(os.Stdin)
 	userInput, _ := reader.ReadString('\n')
 
-	return userInput
+	return strings.TrimSpace(userInput)
 }
 
 func getUserActionFromStdin() (string, error) {
