@@ -16,9 +16,9 @@ const (
 	I will ask you to create a {{ .shell }} script for the operating system {{ .os }} that can be execute in a terminal.
 	You must reply using the following JSON object:
 	{
-		"command": "the {{ .shell }} script as json escaped string.",
-		"executables": ["list of executables that are used in the script as json array of strings"],
-		"explain": "description of the {{ .shell }} script as json escaped line. You must describe succintly, use as few words as possible, do not be verbose. If there are multiple steps, please display them as bullet points."
+		"command": "the {{ .shell }} script as JSON escaped string.",
+		"executables": ["list of executables that are used in the script as JSON array of strings"],
+		"explain": "description of the {{ .shell }} script as JSON escaped string. You must describe succintly, use as few words as possible, do not be verbose. If there are multiple steps, please display them as bullet points."
 	}`
 )
 
