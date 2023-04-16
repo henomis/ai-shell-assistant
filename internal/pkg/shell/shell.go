@@ -8,7 +8,9 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
+	"github.com/briandowns/spinner"
 	"github.com/commander-cli/cmd"
 	"github.com/eiannone/keyboard"
 	"github.com/fatih/color"
@@ -77,10 +79,14 @@ func (s *Shell) Execute(script string) error {
 }
 
 func (s *Shell) handleSuggestion(prompt string) (*ShellResponse, error) {
+
+	suggestSpinner := spinner.New(spinner.CharSets[39], 100*time.Millisecond)
+	suggestSpinner.Start()
 	response, err := s.completion.Suggest(prompt)
 	if err != nil {
 		return nil, fmt.Errorf("completion: %w", err)
 	}
+	suggestSpinner.Stop()
 
 	printCommandLineSuggestionFromResponse(response)
 
