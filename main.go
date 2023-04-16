@@ -61,7 +61,7 @@ func main() {
 				fmt.Printf("%s: %s\n", ErrorShellAI, err)
 				continue
 			}
-		} else if shellResponse.CommandAction == shell.CommandActionExit {
+		} else if shellResponse.CommandAction == shell.CommandActionSkip {
 			break
 		}
 	}

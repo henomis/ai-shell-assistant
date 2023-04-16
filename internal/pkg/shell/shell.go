@@ -30,15 +30,13 @@ type CommandAction string
 
 const (
 	CommandActionExecute CommandAction = "execute"
-	CommandActionRevise  CommandAction = "retry"
-	CommandActionExit    CommandAction = "exit"
+	CommandActionSkip    CommandAction = "exit"
 )
 
 var (
-	yellow = color.New(color.FgYellow).SprintFunc()
-	green  = color.New(color.FgGreen).SprintFunc()
-	red    = color.New(color.FgRed).SprintFunc()
-	white  = color.New(color.FgWhite).SprintFunc()
+	green = color.New(color.FgGreen).SprintFunc()
+	red   = color.New(color.FgRed).SprintFunc()
+	white = color.New(color.FgWhite).SprintFunc()
 )
 
 func New(completion *completion.Completion, shellInterpreter string) *Shell {
@@ -113,9 +111,9 @@ func printCommandLineSuggestionFromResponse(response *completion.CompletionRespo
 
 	color.NoColor = false
 	color.New(color.FgWhite, color.Bold).Printf("\n🤖 Here is your script:\n\n")
-	color.New(color.FgCyan, color.Bold).Printf("%s\n", response.Command)
-	color.New(color.FgWhite, color.Italic).Printf("--\n")
-	color.New(color.FgYellow, color.Italic).Printf("This script uses: %v\n", response.Executables)
+	color.New(color.FgGreen).Printf("%s\n", response.Command)
+	color.New(color.FgWhite).Printf("--\n")
+	color.New(color.FgYellow).Printf("Required commands: %s\n", strings.Join(response.Executables, ", "))
 	color.New(color.FgWhite, color.Italic).Printf("%s\n\n", response.Explain)
 	color.NoColor = true
 }
@@ -143,7 +141,7 @@ func getUserActionFromStdin() (string, error) {
 
 	color.NoColor = false
 	fmt.Printf("%s%s%s%s%s",
-		white("["), green("E"), white("]xecute, ["), red("Q"), white("]uit> "),
+		white("["), green("E"), white("]xecute, ["), red("S"), white("]kip"),
 	)
 	color.NoColor = true
 
@@ -151,6 +149,8 @@ func getUserActionFromStdin() (string, error) {
 	if err != nil {
 		return "", err
 	}
+	fmt.Println()
+	fmt.Println()
 
 	return string(userAction), nil
 }
@@ -159,11 +159,9 @@ func newCommandActionFromUserAction(userAction string) CommandAction {
 	switch strings.ToLower(userAction) {
 	case "e":
 		return CommandActionExecute
-	case "r":
-		return CommandActionRevise
-	case "q":
-		return CommandActionExit
+	case "s":
+		return CommandActionSkip
 	default:
-		return CommandActionExit
+		return CommandActionSkip
 	}
 }
