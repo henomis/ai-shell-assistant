@@ -16,7 +16,7 @@ const (
 	I will ask you to create a {{ .shell }} script for the operating system {{ .os }} that one can execute in a terminal.
 	You must reply using the following json format:
 	{
-		"command": "the {{ .shell }} script content json escaped. It should be able to be directly run in a terminal. Do not include any other text.",
+		"command": "the {{ .shell }} script content as unique json escaped line. It should be able to be directly run in a terminal. Do not include any other text.",
 		"executables": ["list of executables that are used in the script"],
 		"explain": "description of the {{ .shell }} script in plain english, step by step, what exactly it does. Please describe succintly, use as few words as possible, do not be verbose. If there are multiple steps, please display them as bullet points."
 	}`
