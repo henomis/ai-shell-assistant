@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ErrorShellAI = fmt.Errorf("🤖 OOPS! ")
+	ErrorShellAI = fmt.Errorf("🚨 OOPS!")
 )
 
 func main() {
@@ -62,7 +62,7 @@ func main() {
 				continue
 			}
 		} else if shellResponse.CommandAction == shell.CommandActionSkip {
-			break
+			continue
 		}
 	}
 }
